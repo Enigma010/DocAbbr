@@ -1,0 +1,6 @@
+FROM alpine:latest
+VOLUME [ "/data" ]
+# Go to working directory
+WORKDIR /app
+COPY Scripts /app/
+RUN apk add openssl
