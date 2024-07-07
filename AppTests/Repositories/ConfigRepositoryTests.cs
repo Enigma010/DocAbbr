@@ -40,24 +40,6 @@ namespace AppTests.Repositories
             _client.Verify(m => m.GetAsync<Config, Guid>(config.Id), Times.Once);
         }
         [Fact]
-        public async Task GetExpressionAsync()
-        {
-            List<Config> configs = new List<Config>()
-            {
-                new Config(),
-                new Config(),
-                new Config()
-            };
-            Expression<Func<Config, bool>> filter = (c) => c.Enabled == true;
-            _client.Setup(m => m.GetAsync(It.IsAny<Expression<Func<Config, bool>>>())).ReturnsAsync(configs);
-            IEnumerable<Config> getConfigs = await _repository.GetAsync(filter);
-            Assert.Equal(configs, getConfigs);
-            getConfigs.ToList().ForEach(getConfig =>
-            {
-                Assert.Empty(getConfig.GetEvents());
-            });
-        }
-        [Fact]
         public async Task GetAllAsync()
         {
             List<Config> configs = new List<Config>()

@@ -67,9 +67,9 @@ namespace Api.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync([FromRoute] Guid id, 
-            [FromBody] ChangeConfigCmd cmd)
+            [FromBody] ChangeConfigNameCmd cmd)
         {
-            Config config = await _service.ChangeAsync(id, cmd);
+            Config config = await _service.ChangeNameAsync(id, cmd);
             return Ok(config);
         }
         /// <summary>

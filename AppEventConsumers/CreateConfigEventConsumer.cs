@@ -32,7 +32,7 @@ namespace AppEventConsumers
         {
             using (_logger.LogCaller())
             {
-                _logger.LogInformation("Received {@EventName} Id: {@Id} Name: {@Name}", args: [nameof(ConfigChangedEvent), @event.Id, @event.Name]);
+                _logger.LogInformation("Received {@EventName} Id: {@Id} Name: {@Name}", args: [nameof(ConfigNameChangedEvent), @event.Id, @event.Name]);
                 await Task.CompletedTask;
             }
         }

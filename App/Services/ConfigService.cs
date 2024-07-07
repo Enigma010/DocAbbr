@@ -19,7 +19,7 @@ namespace App.Services
         Task<Config> GetAsync(Guid id);
         Task<IEnumerable<Config>> GetAsync();
         Task DeleteAsync(Guid id);
-        Task<Config> ChangeAsync(Guid id, ChangeConfigCmd cmd);
+        Task<Config> ChangeNameAsync(Guid id, ChangeConfigNameCmd cmd);
     }
     /// <summary>
     /// The configuration service.
@@ -112,27 +112,29 @@ namespace App.Services
         /// Changes or updates a configuration
         /// </summary>
         /// <param name="id">The ID of the configuration</param>
-        /// <param name="change">The change that is occurring</param>
+        /// <param name="cmd">The change that is occurring</param>
         /// <returns>The updated configuration</returns>
-        public async Task<Config> ChangeAsync(Guid id, ChangeConfigCmd change)
+        public async Task<Config> ChangeNameAsync(Guid id, ChangeConfigNameCmd cmd)
         {
-            using (_logger.LogCaller())
+            return await ChangeAsync(id, (config) =>
             {
-                using (var unitOfWorks = new UnitOfWorks(_unitOfWorks, _logger))
-                {
-                    return await unitOfWorks.RunAsync(async () =>
-                    {
-                        Func<Config, Config> changeFunc = (config) =>
-                        {
-                            config.Change(change);
-                            return config;
-                        };
-                        var config = await ChangeAsync(id, changeFunc);
-                        await PublishEvents(config);
-                        return config;
-                    });
-                }
-            }
+                config.ChangeName(cmd);
+                return config;
+            });
+        }
+        /// <summary>
+        /// Changes a markdown template
+        /// </summary>
+        /// <param name="id">The ID of the configuration</param>
+        /// <param name="cmd">The change that is occurring</param>
+        /// <returns>The updated configuration</returns>
+        public async Task<Config> ChangeMarkdownTemplateAsync(Guid id, ChangeConfigMarkdownTemplateCmd cmd)
+        {
+            return await ChangeAsync(id, (config) =>
+            {
+                config.ChangeMarkdownTemplates(cmd);
+                return config;
+            });
         }
     }
 }
