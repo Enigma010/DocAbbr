@@ -2,6 +2,8 @@
 using App.Entities;
 using App.Repositories;
 using App.Services;
+using App.Utilities;
+using AppEvents;
 using EventBus;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -66,7 +68,7 @@ namespace AppTests.Services
             _repository.Verify(m => m.GetAsync(), Times.Once);
         }
         [Fact]
-        public async Task ChangeAsync()
+        public async Task ChangeNameAsync()
         {
             Config config = new Config();
             ChangeConfigNameCmd model = new ChangeConfigNameCmd()
@@ -79,6 +81,34 @@ namespace AppTests.Services
             Assert.Equal(config.Id, changeConfig.Id);
             Assert.Equal(model.Name, changeConfig.Name);
             _repository.Verify(m => m.UpdateAsync(It.Is<Config>(c => c.Id == config.Id)), Times.Once);
+        }
+        [Fact]
+        public async Task ChangeMarkdownAsync()
+        {
+            Config config = new Config();
+            config.ClearEvents();
+            _repository.Setup(m => m.GetAsync(It.Is<Guid>(id => id == config.Id))).ReturnsAsync(config);
+            _repository.Setup(m => m.UpdateAsync(It.Is<Config>(c => c.Id == config.Id))).ReturnsAsync(config);
+            List<string> newMarkDown = new List<string>()
+            {
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString()
+            };
+            string newMarkdownReferenceLink = Guid.NewGuid().ToString();
+            Config changeConfig = await _service.ChangeMarkdownTemplateAsync(config.Id, new ChangeConfigMarkdownTemplateCmd(newMarkDown, newMarkdownReferenceLink));
+            var events = changeConfig.GetEvents();
+            Assert.NotEmpty(events);
+            Assert.Collection(events, (e) =>
+            {
+                var changedEvent = Assert.IsType<ConfigMarkdownTemplateChangedEvent>(e);
+                Assert.True(newMarkDown.Same(changedEvent.NewMarkdown));
+                Assert.Equal(newMarkdownReferenceLink, changedEvent.NewMarkdownReferenceLink);
+            });
         }
     }
 }
