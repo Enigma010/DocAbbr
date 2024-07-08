@@ -89,16 +89,11 @@ namespace AppTests.Services
             config.ClearEvents();
             _repository.Setup(m => m.GetAsync(It.Is<Guid>(id => id == config.Id))).ReturnsAsync(config);
             _repository.Setup(m => m.UpdateAsync(It.Is<Config>(c => c.Id == config.Id))).ReturnsAsync(config);
-            List<string> newMarkDown = new List<string>()
+            List<string> newMarkDown = new List<string>();
+            for (int index = 0; index < 7; index++)
             {
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString(),
-                Guid.NewGuid().ToString()
-            };
+                newMarkDown.Add(Guid.NewGuid().ToString());
+            }
             string newMarkdownReferenceLink = Guid.NewGuid().ToString();
             Config changeConfig = await _service.ChangeMarkdownTemplateAsync(config.Id, new ChangeConfigMarkdownTemplateCmd(newMarkDown, newMarkdownReferenceLink));
             var events = changeConfig.GetEvents();
