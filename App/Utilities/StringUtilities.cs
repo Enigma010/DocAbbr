@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace App.Utilities
 {
-    public static class StringTestUtilities
+    public static class StringUtilities
     {
         /// <summary>
         /// Searches for the value in the strings
@@ -14,7 +14,7 @@ namespace App.Utilities
         /// <param name="strings">The enumeration of strings</param>
         /// <param name="value">The value to search for</param>
         /// <returns>Whether the enumeration of string contains value</returns>
-        public static bool Contains(this IEnumerable<string> strings, string value)
+        public static bool Contains(IEnumerable<string> strings, string value)
         {
             return strings.Any(s => s.Contains(value));
         }

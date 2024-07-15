@@ -16,6 +16,7 @@
     <ProjectReference Include="..\AppEvents\AppEvents.csproj" />
     <ProjectReference Include="..\Db\Db.csproj" />
     <ProjectReference Include="..\Logging\Logging.csproj" />
+    <ProjectReference Include="..\Markdown\Markdown.csproj" />
     <ProjectReference Include="..\MongoDb\MongoDb.csproj" />
   </ItemGroup>
 

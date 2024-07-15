@@ -3,6 +3,7 @@ using App.Services;
 using AppCore;
 using EventBus.Di;
 using Logging.Di;
+using Markdown;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDb.Di;
@@ -28,6 +29,9 @@ namespace App.Di
                 ]);
             builder.Services.AddScoped<IConfigService, ConfigService>();
             builder.Services.AddScoped<IConfigRepository, ConfigRepository>();
+            builder.Services.AddScoped<IAbbreviationService, AbbreviationService>();
+            builder.Services.AddScoped<IAbbreviationRepository, AbbreviationRepository>();
+            builder.Services.AddScoped<IMarkdownClient, MarkdownClient>();
         }
     }
 }

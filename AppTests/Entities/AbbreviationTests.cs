@@ -78,12 +78,12 @@ namespace AppTests.Entities
             List<string> markdown = abbreviation.Markdown(config).ToList();
             foreach(string find in new string[] { abbreviation.ShortForm, abbreviation.LongForm, abbreviation.Description })
             {
-                Assert.True(StringTestUtilities.Contains(markdown, find));
+                Assert.True(StringUtilities.Contains(markdown, find));
             }
             foreach(App.Entities.Link link in abbreviation.ReferenceLinks)
             {
-                Assert.True(StringTestUtilities.Contains(markdown, link.Url));
-                Assert.True(StringTestUtilities.Contains(markdown, link.LinkText));
+                Assert.True(StringUtilities.Contains(markdown, link.Url));
+                Assert.True(StringUtilities.Contains(markdown, link.LinkText));
             }
         }
         [Fact]
@@ -94,7 +94,7 @@ namespace AppTests.Entities
             string newFullName = Guid.NewGuid().ToString();
             abbreviation.Change(new ChangeAbbreviationCmd(newFullName, abbreviation.Description));
             List<string> markdown = abbreviation.Markdown(config).ToList();
-            Assert.True(StringTestUtilities.Contains(markdown, newFullName));
+            Assert.True(StringUtilities.Contains(markdown, newFullName));
         }
         [Fact]
         public void ChangeDescription()
@@ -104,7 +104,7 @@ namespace AppTests.Entities
             string description = Guid.NewGuid().ToString();
             abbreviation.Change(new ChangeAbbreviationCmd(abbreviation.LongForm, description));
             List<string> markdown = abbreviation.Markdown(config).ToList();
-            Assert.True(StringTestUtilities.Contains(markdown, description));
+            Assert.True(StringUtilities.Contains(markdown, description));
         }
         [Fact]
         public void AddReferenceLink()

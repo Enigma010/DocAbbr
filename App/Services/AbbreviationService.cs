@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnitOfWork;
 using Logging;
+using Markdown;
 
 namespace App.Services
 {
@@ -21,9 +22,14 @@ namespace App.Services
         Task<IEnumerable<Abbreviation>> GetAsync();
         Task DeleteAsync(string shortForm);
         Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd cmd);
+        Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId);
+        Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId);
+
     }
     public class AbbreviationService : BaseService<IAbbreviationRepository, Abbreviation, string>, IAbbreviationService
     {
+        private readonly IConfigService _configService;
+        private readonly IMarkdownClient _markdownClient;
         /// <summary>
         /// Creates a configuration service
         /// </summary>
@@ -32,9 +38,13 @@ namespace App.Services
         public AbbreviationService(
             IAbbreviationRepository repository,
             ILogger<IAbbreviationService> logger,
+            IConfigService configService,
+            IMarkdownClient markdownClient,
             IEventPublisher eventPublisher)
             : base(repository, eventPublisher, logger)
         {
+            _configService = configService;
+            _markdownClient = markdownClient;
         }
 
         /// <summary>
@@ -119,6 +129,30 @@ namespace App.Services
                 abbreviation.Change(change);
                 return abbreviation;
             });
+        }
+        /// <summary>
+        /// Converts the markdown to HTML
+        /// </summary>
+        /// <param name="shortForm"></param>
+        /// <param name="configurationId"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId)
+        {
+            Abbreviation abbreviation = await GetAsync(shortForm);
+            Config config = await _configService.GetAsync(configurationId);
+            return abbreviation.Markdown(config).ToList();
+        }
+        /// <summary>
+        /// Converts the markdown to HTML
+        /// </summary>
+        /// <param name="shortForm"></param>
+        /// <param name="configurationId"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId)
+        {
+            List<string> markdown = await GetMarkdownAsync(shortForm, configurationId);
+            string html = _markdownClient.ToHtml(string.Join("\n", markdown));
+            return html.Split("\n").ToList(); 
         }
     }
 }

@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppEventConsumers", "..\App
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReflectionUtilities", "..\ReflectionUtilities\ReflectionUtilities.csproj", "{8F0D5B86-727C-4B33-ADA7-0FFB576E0D60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "..\Logging\Logging.csproj", "{43926B97-99B3-4E3A-9BB1-E48886D0928F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logging", "..\Logging\Logging.csproj", "{43926B97-99B3-4E3A-9BB1-E48886D0928F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown", "..\Markdown\Markdown.csproj", "{F7FED31C-F8C9-4B72-82D4-77AF61817A60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{43926B97-99B3-4E3A-9BB1-E48886D0928F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43926B97-99B3-4E3A-9BB1-E48886D0928F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43926B97-99B3-4E3A-9BB1-E48886D0928F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7FED31C-F8C9-4B72-82D4-77AF61817A60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7FED31C-F8C9-4B72-82D4-77AF61817A60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7FED31C-F8C9-4B72-82D4-77AF61817A60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7FED31C-F8C9-4B72-82D4-77AF61817A60}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
