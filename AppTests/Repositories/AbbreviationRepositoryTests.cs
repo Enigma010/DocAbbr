@@ -1,5 +1,6 @@
 ﻿using App.Entities;
 using App.Repositories;
+using App.Repositories.Dtos;
 using Db;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,11 +21,11 @@ namespace AppTests.Repositories
         [Fact]
         public async Task New()
         {
-            Abbreviation abbreviation = new Abbreviation("CD");
-            _dbClient.Setup(e => e.GetAsync<Abbreviation, string>(It.Is<string>(id => id == abbreviation.ShortForm))).ReturnsAsync(abbreviation);
+            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, string.Empty);
+            _dbClient.Setup(e => e.GetAsync<AbbreviationDto, string>(It.Is<string>(id => id == abbreviation.ShortForm))).ReturnsAsync(abbreviation.GetDto());
             Abbreviation dbAbbreviation = await _repository.GetAsync(abbreviation.Id);
             Assert.NotNull(dbAbbreviation);
-            Assert.Equal(abbreviation, dbAbbreviation);
+            Assert.Equal(abbreviation.GetDto(), dbAbbreviation.GetDto());
         }
     }
 }

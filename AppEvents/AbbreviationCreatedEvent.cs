@@ -11,15 +11,30 @@ namespace AppEvents
         /// <summary>
         /// Abbreviation created
         /// </summary>
-        /// <param name="name">The abbreviatino name</param>
-        public AbbreviationCreatedEvent(string name) 
+        /// <param name="shortForm">The abbreviatino name</param>
+        public AbbreviationCreatedEvent(
+            string shortForm,
+            string longForm,
+            string description) 
         { 
-            Name = name;
+            ShortForm = shortForm;
+            LongForm = longForm;
+            Description = description;
         }
         /// <summary>
         /// The abbreviatin name, for example CD
         /// for compact disk
         /// </summary>
-        public string Name { get; private set; } = string.Empty;
+        public string ShortForm { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// The long form, for example compact disk
+        /// </summary>
+        public string LongForm { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// The description
+        /// </summary>
+        public string Description { get; private set; } = string.Empty;
     }
 }

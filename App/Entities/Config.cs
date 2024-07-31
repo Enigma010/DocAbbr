@@ -1,4 +1,5 @@
 ﻿using App.Commands;
+using App.Repositories.Dtos;
 using App.Utilities;
 using AppCore;
 using AppEvents;
@@ -8,7 +9,7 @@ namespace App.Entities
     /// <summary>
     /// The configuration object
     /// </summary>
-    public class Config : Entity<Guid>
+    public class Config : Entity<ConfigDto, Guid>
     {
         public const string ShortFormTemplate = "{{shortForm}}";
         public const string LongFormTemplate = "{{longForm}}";
@@ -16,14 +17,20 @@ namespace App.Entities
         public const string ReferenceLinksTemplate = "{{referenceLinks}}";
         public const string ReferenceLinkNameTemplate = "{{referenceLinkName}}";
         public const string ReferenceLinkTemplate = "{{referenceLink}}";
-        private readonly List<string> _markdown = new List<string>();
+        /// <summary>
+        /// Creates a new configuration loaded from the repository
+        /// </summary>
+        /// <param name="dto"></param>
+        public Config(ConfigDto dto) : base(dto)
+        {
+        }
         /// <summary>
         /// Createa a new configuration
         /// </summary>
         public Config() : base(Guid.NewGuid)
         {
-            _markdown = MarkdownTemplate();
-            MarkdownReferenceLink = MarkdownReferenceLinkTemplate();
+            _dto.Markdown = MarkdownTemplate();
+            _dto.MarkdownReferenceLink = MarkdownReferenceLinkTemplate();
             AddEvent(new ConfigCreatedEvent(Id, Name, Markdown, MarkdownReferenceLink));
         }
         /// <summary>
@@ -31,29 +38,32 @@ namespace App.Entities
         /// </summary>
         public Config(string name, bool enabled = false) : base(Guid.NewGuid)
         {
-            Name = name;
-            _markdown = MarkdownTemplate();
-            MarkdownReferenceLink = MarkdownReferenceLinkTemplate();
+            _dto.Name = name;
+            _dto.Markdown = MarkdownTemplate();
+            _dto.MarkdownReferenceLink = MarkdownReferenceLinkTemplate();
             AddEvent(new ConfigCreatedEvent(Id, Name, Markdown, MarkdownReferenceLink));
         }
+
         /// <summary>
         /// The name of the configuration
         /// </summary>
-        public string Name { get; private set; } = string.Empty;
+        public string Name => _dto.Name;
+        
+        /// <summary>
+        /// Whether this is enabled or not
+        /// </summary>
+        public bool Enabled => _dto.Enabled;
+        
         /// <summary>
         /// The markdown for an abbreviation
         /// </summary>
-        public IReadOnlyCollection<string> Markdown
-        {
-            get
-            {
-                return _markdown.AsReadOnly();
-            }
-        }
+        public IReadOnlyCollection<string> Markdown => (_dto.Markdown ?? new List<string>()).AsReadOnly();
+        
         /// <summary>
         /// The markdown for a reference link
         /// </summary>
-        public string MarkdownReferenceLink { get; private set; } = string.Empty;
+        public string MarkdownReferenceLink => _dto.MarkdownReferenceLink ?? string.Empty;
+        
         /// <summary>
         /// Set the config to be deleted
         /// </summary>
@@ -61,6 +71,7 @@ namespace App.Entities
         {
             AddEvent(new ConfigDeletedEvent(Id));
         }
+        
         /// <summary>
         /// Chagne the configuration
         /// </summary>
@@ -75,7 +86,7 @@ namespace App.Entities
             bool changed = false;
             if (Name != change.Name)
             {
-                Name = change.Name;
+                _dto.Name = change.Name;
                 changed = true;
             }
             if(changed)
@@ -83,6 +94,7 @@ namespace App.Entities
                 AddEvent(new ConfigNameChangedEvent(Id, oldName, Name));
             }
         }
+        
         /// <summary>
         /// Changes markdown templates
         /// </summary>
@@ -92,11 +104,12 @@ namespace App.Entities
             if (!Markdown.Same(cmd.Markdown) || MarkdownReferenceLink != cmd.MarkdownReferenceLink)
             {
                 AddEvent(new ConfigMarkdownTemplateChangedEvent(Markdown, cmd.Markdown, MarkdownReferenceLink, cmd.MarkdownReferenceLink));
-                _markdown.Clear();
-                _markdown.AddRange(cmd.Markdown);
-                MarkdownReferenceLink = cmd.MarkdownReferenceLink;
+                _dto.Markdown.Clear();
+                _dto.Markdown.AddRange(cmd.Markdown);
+                _dto.MarkdownReferenceLink = cmd.MarkdownReferenceLink;
             }
         }
+        
         /// <summary>
         /// The default markdown template for the entire abbreviation
         /// </summary>
@@ -114,6 +127,7 @@ namespace App.Entities
                 $"{ReferenceLinksTemplate}"
             };
         }
+        
         /// <summary>
         /// Teh default markdown template for a reference link
         /// </summary>

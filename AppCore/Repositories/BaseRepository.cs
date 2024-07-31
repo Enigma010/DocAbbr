@@ -12,11 +12,11 @@ namespace AppCore.Repositories
     /// </summary>
     /// <typeparam name="EntityType">The entity type</typeparam>
     /// <typeparam name="IdType">The ID type of that entity</typeparam>
-    public interface IBaseRepository<EntityType, IdType> : IUnitOfWork
+    public interface IBaseRepository<EntityType, EntityDtoType, IdType> : IUnitOfWork
     {
         Task<EntityType> GetAsync(IdType id);
         Task<IEnumerable<EntityType>> GetAsync();
-        Task<IEnumerable<EntityType>> GetAsync(Expression<Func<EntityType, bool>> expression);
+        Task<IEnumerable<EntityType>> GetAsync(Expression<Func<EntityDtoType, bool>> expression);
         Task<EntityType> InsertAsync(EntityType entity);
         Task<EntityType> UpdateAsync(EntityType entity);
         Task DeleteAsync(EntityType entity);
@@ -31,13 +31,18 @@ namespace AppCore.Repositories
     /// <typeparam name="EntityType">The type of eneity</typeparam>
     /// <typeparam name="IdType">The type of ID</typeparam>
     [ExcludeFromCodeCoverage(Justification = "Core infrastructure, unit tests would at a lower level")]
-    public class BaseRepository<RepositoryType, EntityType, IdType> 
-        : IBaseRepository<EntityType, IdType> where EntityType 
-        : IEntity<IdType> where IdType 
-        : IComparable
+    public class BaseRepository<RepositoryType, EntityType, EntityDtoType, IdType> : IBaseRepository<EntityType, EntityDtoType, IdType>
+        where EntityDtoType : EntityDto<IdType>
+        where EntityType : Entity<EntityDtoType, IdType>
+        where IdType : IComparable
     {
         protected readonly ILogger<RepositoryType> _logger;
         protected readonly IDbClient _client;
+        /// <summary>
+        /// Creates a new base repository
+        /// </summary>
+        /// <param name="client">The database client</param>
+        /// <param name="logger">The logger</param>
         public BaseRepository(IDbClient client,
             ILogger<RepositoryType> logger)
         {
@@ -54,7 +59,7 @@ namespace AppCore.Repositories
             using (_logger.LogCaller())
             {
                 _logger.LogInformation("Inserting {Id}", entity.Id);
-                await _client.InsertAsync<EntityType, IdType>(entity);
+                await _client.InsertAsync<EntityDtoType, IdType>(entity.GetDto());
                 _logger.LogInformation("Inserted {Id}", entity.Id);
                 return entity;
             }
@@ -70,7 +75,7 @@ namespace AppCore.Repositories
             using (_logger.LogCaller())
             {
                 _logger.LogInformation("Updating {Id}", entity.Id);
-                await _client.UpdateAsync<EntityType, IdType>(entity);
+                await _client.UpdateAsync<EntityDtoType, IdType>(entity.GetDto());
                 _logger.LogInformation("Updated {Id}", entity.Id);
                 return entity;
             }
@@ -89,7 +94,7 @@ namespace AppCore.Repositories
                 entity.Deleted();
                 _logger.LogInformation("Marked entity {Id} as deleted", entity.Id);
                 _logger.LogInformation("Deleting {Id}", entity.Id);
-                await _client.DeleteAsync<EntityType, IdType>(entity);
+                await _client.DeleteAsync<EntityDtoType, IdType>(entity.GetDto());
                 _logger.LogInformation("Deleted {Id}", entity.Id);
             }
         }
@@ -104,7 +109,8 @@ namespace AppCore.Repositories
             using (_logger.LogCaller())
             {
                 _logger.LogInformation("Getting {Id}", id);
-                EntityType entity = await _client.GetAsync<EntityType, IdType>(id);
+                EntityDtoType entityDto = await _client.GetAsync<EntityDtoType, IdType>(id);
+                EntityType entity = (EntityType?)Activator.CreateInstance(typeof(EntityType), entityDto) ?? throw new NullReferenceException();
                 _logger.LogInformation("Got {Id}", id);
                 ClearEvents(new List<EntityType> { entity });
                 return entity;
@@ -117,15 +123,16 @@ namespace AppCore.Repositories
         /// <typeparam name="EntityType">The entity type</typeparam>
         /// <param name="expression">The filter expression</param>
         /// <returns>The entities that match the expression</returns>
-        public virtual async Task<IEnumerable<EntityType>> GetAsync(Expression<Func<EntityType, bool>> expression)
+        public virtual async Task<IEnumerable<EntityType>> GetAsync(Expression<Func<EntityDtoType, bool>> expression)
         {
             using (_logger.LogCaller())
             {
                 _logger.LogInformation("Getting by expression");
-                IEnumerable<EntityType> entities = await _client.GetAsync(expression);
+                IEnumerable<EntityDtoType> entityDtos = await _client.GetAsync<EntityDtoType>(expression);
                 _logger.LogInformation("Got by expression");
-                ClearEvents(entities);
-                return entities;
+                IEnumerable<EntityType> entites = entityDtos.Select(GetEntity);
+                ClearEvents(entites);
+                return entites;
             }
         }
 
@@ -138,22 +145,11 @@ namespace AppCore.Repositories
             using (_logger.LogCaller())
             {
                 _logger.LogInformation("Getting all");
-                IEnumerable<EntityType> entities = await _client.GetAsync<EntityType, IdType>();
+                IEnumerable<EntityDtoType> entityDtos = await _client.GetAsync<EntityDtoType, IdType>();
                 _logger.LogInformation("Got all");
+                IEnumerable<EntityType> entities = entityDtos.Select(GetEntity);
                 ClearEvents(entities);
                 return entities;
-            }
-        }
-        /// <summary>
-        /// Clears the events on the entities
-        /// </summary>
-        /// <param name="entities">The entities</param>
-        private void ClearEvents(IEnumerable<EntityType> entities)
-        {
-            using (_logger.LogCaller())
-            {
-                _logger.LogInformation("Clearing events");
-                entities.ToList().ForEach(entity => entity.ClearEvents());
             }
         }
 
@@ -181,6 +177,30 @@ namespace AppCore.Repositories
         public async Task Rollback()
         {
             await _client.Rollback();
+        }
+
+        /// <summary>
+        /// Clears the events on the entities
+        /// </summary>
+        /// <param name="entities">The entities</param>
+        private void ClearEvents(IEnumerable<EntityType> entities)
+        {
+            using (_logger.LogCaller())
+            {
+                _logger.LogInformation("Clearing events");
+                entities.ToList().ForEach(entity => entity.ClearEvents());
+            }
+        }
+
+        /// <summary>
+        /// Gets an entity object from an entity dto object
+        /// </summary>
+        /// <param name="entityDto">The entity dto</param>
+        /// <returns>The entity</returns>
+        /// <exception cref="NullReferenceException">Thrown if unable to get entity from the dto</exception>
+        private EntityType GetEntity(EntityDtoType entityDto)
+        {
+            return (EntityType?)Activator.CreateInstance(typeof(EntityType), entityDto) ?? throw new NullReferenceException();
         }
     }
 }

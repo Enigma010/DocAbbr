@@ -1,4 +1,5 @@
 ﻿using App.Entities;
+using App.Repositories.Dtos;
 using AppCore.Repositories;
 using Db;
 using Microsoft.Extensions.Logging;
@@ -13,13 +14,13 @@ namespace App.Repositories
     /// <summary>
     /// Abbreviation repository saves abbreviation to the data store
     /// </summary>
-    public interface IAbbreviationRepository : IBaseRepository<Abbreviation, string>
+    public interface IAbbreviationRepository : IBaseRepository<Abbreviation, AbbreviationDto, string>
     {
     }
     /// <summary>
     /// Abbreviation repository saves abbreviation to the data store
     /// </summary>
-    public class AbbreviationRepository : BaseRepository<IAbbreviationRepository, Abbreviation, string>, IAbbreviationRepository
+    public class AbbreviationRepository : BaseRepository<IAbbreviationRepository, Abbreviation, AbbreviationDto, string>, IAbbreviationRepository
     {
         public AbbreviationRepository(IDbClient client, ILogger<IAbbreviationRepository> logger) : base(client, logger)
         {

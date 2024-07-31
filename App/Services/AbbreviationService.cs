@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using UnitOfWork;
 using Logging;
 using Markdown;
+using App.Repositories.Dtos;
 
 namespace App.Services
 {
@@ -22,11 +23,12 @@ namespace App.Services
         Task<IEnumerable<Abbreviation>> GetAsync();
         Task DeleteAsync(string shortForm);
         Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd cmd);
+        Task<Abbreviation> ChangeLinksAsync(string shortForm, ChangeAbbreviationLinksCmd cmd);
         Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId);
         Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId);
 
     }
-    public class AbbreviationService : BaseService<IAbbreviationRepository, Abbreviation, string>, IAbbreviationService
+    public class AbbreviationService : BaseService<IAbbreviationRepository, Abbreviation, AbbreviationDto, string>, IAbbreviationService
     {
         private readonly IConfigService _configService;
         private readonly IMarkdownClient _markdownClient;
@@ -60,7 +62,7 @@ namespace App.Services
                 {
                     return await unitOfWorks.RunAsync(async () =>
                     {
-                        Abbreviation abbreviation = new Abbreviation(cmd.ShortForm);
+                        Abbreviation abbreviation = new Abbreviation(cmd.ShortForm, cmd.LongForm, cmd.Description);
                         await _repository.InsertAsync(abbreviation);
                         await PublishEvents(abbreviation);
                         return abbreviation;
@@ -117,16 +119,30 @@ namespace App.Services
         }
 
         /// <summary>
-        /// Changes or updates a configuration
+        /// Changes or updates an abbreviation
         /// </summary>
         /// <param name="shortForm">The short form of the abbreviation</param>
-        /// <param name="change">The change that is occurring</param>
-        /// <returns>The updated configuration</returns>
-        public async Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd change)
+        /// <param name="cmd">The change that is occurring</param>
+        /// <returns>The updated abbreviation</returns>
+        public async Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd cmd)
         {
             return await ChangeAsync(shortForm, (abbreviation) =>
             {
-                abbreviation.Change(change);
+                abbreviation.Change(cmd);
+                return abbreviation;
+            });
+        }
+        /// <summary>
+        /// Changes or updates an abbreviation links
+        /// </summary>
+        /// <param name="shortForm">The short form of the abbreviation</param>
+        /// <param name="cmd">The change that is occurring</param>
+        /// <returns>The updated abbreviation</returns>
+        public async Task<Abbreviation> ChangeLinksAsync(string shortForm, ChangeAbbreviationLinksCmd cmd)
+        {
+            return await ChangeAsync(shortForm, (abbreviation) =>
+            {
+                abbreviation.ChangeLinks(cmd);
                 return abbreviation;
             });
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Data;
 using System.Linq.Expressions;
 using UnitOfWork;
 
@@ -13,11 +14,11 @@ namespace Db
         public const string UserNamePattern = "{username}";
         public const string PasswordPattern = "{password}";
         public const string PortPattern = "{port}";
-        Task InsertAsync<EntityType, IdType>(EntityType entity) where EntityType : IDbEntity<IdType>;
-        Task DeleteAsync<EntityType, IdType>(EntityType entity) where EntityType : IDbEntity<IdType>;
-        Task UpdateAsync<EntityType, IdType>(EntityType entity) where EntityType : IDbEntity<IdType> where IdType : IComparable;
-        Task<EntityType> GetAsync<EntityType, IdType>(IdType id);
-        Task<IEnumerable<EntityType>> GetAsync<EntityType, IdType>();
-        Task<IEnumerable<EntityType>> GetAsync<EntityType>(Expression<Func<EntityType, bool>> expression);
+        Task InsertAsync<DbType, IdType>(DbType entity) where DbType : IDbEntity<IdType>;
+        Task DeleteAsync<DbType, IdType>(DbType entity) where DbType : IDbEntity<IdType>;
+        Task UpdateAsync<DbType, IdType>(DbType entity) where DbType : IDbEntity<IdType> where IdType : IComparable;
+        Task<DbType> GetAsync<DbType, IdType>(IdType id);
+        Task<IEnumerable<DbType>> GetAsync<DbType, IdType>();
+        Task<IEnumerable<DbType>> GetAsync<DbType>(Expression<Func<DbType, bool>> expression) where DbType : class;
     }
 }

@@ -3,6 +3,7 @@ using App.Entities;
 using AppEvents;
 using App.Utilities;
 using System.Net.Sockets;
+using App.Mappers;
 
 namespace AppTests.Entities
 {
@@ -15,7 +16,7 @@ namespace AppTests.Entities
         public void New()
         {
             string name = "CD";
-            Abbreviation abbreviation = new Abbreviation(name);
+            Abbreviation abbreviation = new Abbreviation(name, string.Empty, string.Empty);
             IReadOnlyCollection<object> events = abbreviation.GetEvents();
             Assert.NotEmpty(events);
             Assert.Collection(events, (e) =>
@@ -23,18 +24,23 @@ namespace AppTests.Entities
                 Assert.IsType<AbbreviationCreatedEvent>(e);
                 AbbreviationCreatedEvent createdEvent = e as AbbreviationCreatedEvent ?? throw new ArgumentNullException();
                 Assert.NotNull(createdEvent);
-                Assert.Equal(name, createdEvent.Name);
+                Assert.Equal(name, createdEvent.ShortForm);
             });
         }
         [Fact]
         public void NewWithLinks()
         {
             string name = "CD";
-            List<App.Entities.Link> links = new List<App.Entities.Link>()
+            ChangeAbbreviationLinksCmd cmd = new ChangeAbbreviationLinksCmd(new List<ChangeLinkCmd>()
             {
-                new App.Entities.Link(@$"https://{Guid.NewGuid()}.com", Guid.NewGuid().ToString())
-            };
-            Abbreviation abbreviation = new Abbreviation(name, links);
+                new ChangeLinkCmd()
+                {
+                    Url = @$"https://{Guid.NewGuid()}.com",
+                    LinkText = Guid.NewGuid().ToString()
+                }
+            });
+            Abbreviation abbreviation = new Abbreviation(name, string.Empty, string.Empty);
+            abbreviation.ChangeLinks(cmd);
             var events = abbreviation.GetEvents();
             Assert.NotEmpty(events);
             Assert.Collection(events,
@@ -51,7 +57,7 @@ namespace AppTests.Entities
         [Fact]
         public void ChangeName()
         {
-            Abbreviation abbreviation = new Abbreviation("CD");
+            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, string.Empty);
             abbreviation.ClearEvents();
             string oldFullName = abbreviation.LongForm;
             string oldDescription = abbreviation.Description;
@@ -194,7 +200,7 @@ namespace AppTests.Entities
             List<App.Entities.Link> links = new List<App.Entities.Link>();
             links.Add(new App.Entities.Link($"https://{Guid.NewGuid()}.domain.com", Guid.NewGuid().ToString()));
             links.Add(new App.Entities.Link($"https://{Guid.NewGuid()}.domain.com", Guid.NewGuid().ToString()));
-            Abbreviation abbreviation = new Abbreviation(abbreviationString);
+            Abbreviation abbreviation = new Abbreviation(abbreviationString, string.Empty, string.Empty);
             abbreviation.Change(new App.Commands.ChangeAbbreviationCmd(fullName, description));
             abbreviation.ChangeLinks(new ChangeAbbreviationLinksCmd(links));
             return abbreviation;

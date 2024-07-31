@@ -47,7 +47,7 @@ namespace AppTests.Services
         public async Task Get()
         {
             string name = Guid.NewGuid().ToString();
-            Abbreviation abbreviation = new Abbreviation(name);
+            Abbreviation abbreviation = new Abbreviation(name, string.Empty, string.Empty);
             _repository.Setup(x => x.GetAsync(It.Is<string>(id => id == name))).ReturnsAsync(abbreviation);
             Abbreviation dbAbbreviation = await _service.GetAsync(name);
             Assert.Equal(abbreviation, dbAbbreviation);
@@ -57,9 +57,9 @@ namespace AppTests.Services
         {
             List<Abbreviation> abbreviations = new List<Abbreviation>()
             {
-                new Abbreviation(Guid.NewGuid().ToString()),
-                new Abbreviation(Guid.NewGuid().ToString()),
-                new Abbreviation(Guid.NewGuid().ToString())
+                new Abbreviation(Guid.NewGuid().ToString(), string.Empty, string.Empty),
+                new Abbreviation(Guid.NewGuid().ToString(), string.Empty, string.Empty),
+                new Abbreviation(Guid.NewGuid().ToString(), string.Empty, string.Empty)
             };
             _repository.Setup(x => x.GetAsync()).ReturnsAsync(abbreviations);
             List<Abbreviation> dbAbbreviations = (await _service.GetAsync()).ToList();
@@ -69,7 +69,7 @@ namespace AppTests.Services
         public async Task Delete()
         {
             string shortForm = Guid.NewGuid().ToString();
-            Abbreviation abbreviation = new Abbreviation(shortForm);
+            Abbreviation abbreviation = new Abbreviation(shortForm, string.Empty, string.Empty);
             _repository.Setup(x => x.GetAsync(It.Is<string>(id => id == shortForm))).ReturnsAsync(abbreviation);
             await _service.DeleteAsync(shortForm);
             _repository.Verify(x => x.DeleteAsync(It.Is<Abbreviation>(a => a.ShortForm == shortForm)), Times.Once());
@@ -80,7 +80,7 @@ namespace AppTests.Services
             string shortForm = Guid.NewGuid().ToString();
             string longForm = Guid.NewGuid().ToString();
             string newDescription = Guid.NewGuid().ToString();
-            Abbreviation abbreviation = new Abbreviation(shortForm);
+            Abbreviation abbreviation = new Abbreviation(shortForm, string.Empty, string.Empty);
             _repository.Setup(x => x.GetAsync(It.Is<string>(id => id == shortForm))).ReturnsAsync(abbreviation);
             _repository.Setup(x => x.UpdateAsync(It.Is<Abbreviation>(a => a.ShortForm == shortForm))).ReturnsAsync(abbreviation);
             Abbreviation dbAbbreviation = await _service.ChangeAsync(shortForm, new ChangeAbbreviationCmd(
@@ -118,7 +118,7 @@ namespace AppTests.Services
                 new Link($"https://{Guid.NewGuid()}.com", $"{Guid.NewGuid()}"),
             };
             _configService.Setup(x => x.GetAsync(It.Is<Guid>(id => id == config.Id))).ReturnsAsync(config);
-            Abbreviation abbreviation = new Abbreviation("cd");
+            Abbreviation abbreviation = new Abbreviation("cd", string.Empty, string.Empty);
             abbreviation.Change(new ChangeAbbreviationCmd(
                 description: "An opticial disk with encoded data",
                 longForm: "Compact Disk"

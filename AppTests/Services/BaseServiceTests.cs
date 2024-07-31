@@ -12,12 +12,12 @@ namespace AppTests.Services
     {
         private readonly Mock<ITestEntityRepository> _repository;
         private readonly Mock<IEventPublisher> _eventPublisher;
-        private readonly Mock<ILogger<BaseService<ITestEntityRepository, TestEntity, Guid>>> _logger;
+        private readonly Mock<ILogger<BaseService<ITestEntityRepository, TestEntity, TestEntityDto, Guid>>> _logger;
         public BaseServiceTests()
         {
             _repository = new Mock<ITestEntityRepository>();
             _eventPublisher = new Mock<IEventPublisher>();
-            _logger = new Mock<ILogger<BaseService<ITestEntityRepository, TestEntity, Guid>>>();
+            _logger = new Mock<ILogger<BaseService<ITestEntityRepository, TestEntity, TestEntityDto, Guid>>>();
         }
         [Fact]
         public async Task ChangeAsync()
@@ -25,8 +25,8 @@ namespace AppTests.Services
             TestEntity entity = new TestEntity();
             _repository.Setup(m => m.GetAsync(It.Is<Guid>(id => id == entity.Id))).ReturnsAsync(entity);
             _repository.Setup(m => m.UpdateAsync(It.Is<TestEntity>(te => te.Id == entity.Id))).ReturnsAsync(entity);
-            BaseService<ITestEntityRepository, TestEntity, Guid> service
-                = new BaseService<ITestEntityRepository, TestEntity, Guid>(_repository.Object, _eventPublisher.Object, _logger.Object);
+            BaseService<ITestEntityRepository, TestEntity, TestEntityDto, Guid> service
+                = new BaseService<ITestEntityRepository, TestEntity, TestEntityDto, Guid>(_repository.Object, _eventPublisher.Object, _logger.Object);
             bool changed = false;
             Func<TestEntity, TestEntity> changeFunc = (entity) =>
             {

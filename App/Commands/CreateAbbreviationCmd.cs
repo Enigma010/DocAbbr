@@ -19,9 +19,20 @@ namespace App.Commands
         { 
             ShortForm = shortForm;
         }
+
         /// <summary>
         /// The short form
         /// </summary>
         public string ShortForm { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The long form
+        /// </summary>
+        public string LongForm { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The description
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
     }
 }

@@ -156,14 +156,14 @@ namespace MongoDb
         /// <typeparam name="EntityType">The entity type</typeparam>
         /// <param name="expression">The expression to get the entity by</param>
         /// <returns></returns>
-        public async Task<IEnumerable<EntityType>> GetAsync<EntityType>(Expression<Func<EntityType, bool>> expression)
+        public async Task<IEnumerable<EntityDtoType>> GetAsync<EntityDtoType>(Expression<Func<EntityDtoType, bool>> expression) where EntityDtoType : class
         {
             using (_logger.LogCaller())
             {
-                var collection = GetCollectionForEntityType<EntityType>();
-                var filter = Builders<EntityType>.Filter.Where(expression);
+                var collection = GetCollectionForEntityType<EntityDtoType>();
+                var filter = Builders<EntityDtoType>.Filter.Where(expression);
                 _logger.LogInformation("Getting by expression");
-                var entities = await (await collection.FindAsync<EntityType>(filter)).ToListAsync();
+                var entities = await (await collection.FindAsync<EntityDtoType>(filter)).ToListAsync();
                 _logger.LogInformation("Got by expression");
                 return entities;
             }

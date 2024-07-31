@@ -1,6 +1,7 @@
 ﻿using App.Commands;
 using App.Entities;
 using App.Repositories;
+using App.Repositories.Dtos;
 using AppCore.Services;
 using EventBus;
 using Logging;
@@ -24,7 +25,7 @@ namespace App.Services
     /// <summary>
     /// The configuration service.
     /// </summary>
-    public class ConfigService : BaseService<IConfigRepository, Config, Guid>, IConfigService
+    public class ConfigService : BaseService<IConfigRepository, Config, ConfigDto, Guid>, IConfigService
     {
         /// <summary>
         /// Creates a configuration service
