@@ -42,8 +42,10 @@ namespace App.Entities
         /// <param name="description">The description</param>
         public Abbreviation(string shortForm, 
             string longForm, 
-            string description) : base(() => { return shortForm; })
+            IEnumerable<string> description) : base(() => { return shortForm; })
         {
+            _dto.LongForm = longForm;
+            _dto.Description = description.ToList();
             AddEvent(new AbbreviationCreatedEvent(shortForm, longForm, description));
         }
 
@@ -62,7 +64,7 @@ namespace App.Entities
         /// <summary>
         /// The description of the abbreviation
         /// </summary>
-        public string Description => _dto.Description;
+        public IReadOnlyCollection<string> Description => _dto.Description.AsReadOnly();
         
         /// <summary>
         /// The reference links
@@ -110,7 +112,7 @@ namespace App.Entities
             StringBuilder markdown = new StringBuilder(string.Join('\n', config.Markdown));
             markdown = markdown.Replace(Config.ShortFormTemplate, ShortForm);
             markdown = markdown.Replace(Config.LongFormTemplate, LongForm);
-            markdown = markdown.Replace(Config.DescriptionTemplate, Description);
+            markdown = markdown.Replace(Config.DescriptionTemplate, string.Join('\n', Description));
             StringBuilder referenceLinksMarkdown = new StringBuilder();
             if (!string.IsNullOrEmpty(config.MarkdownReferenceLink))
             {

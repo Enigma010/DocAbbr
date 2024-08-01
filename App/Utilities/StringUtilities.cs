@@ -18,6 +18,20 @@ namespace App.Utilities
         {
             return strings.Any(s => s.Contains(value));
         }
+
+
+        public static bool Contains(IEnumerable<string> strings, IEnumerable<string> values)
+        {
+            foreach(var value in values)
+            {
+                if (!strings.Any(s => s.Contains(value)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         /// <summary>
         /// Validates if left string match the right strings
         /// </summary>

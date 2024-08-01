@@ -16,7 +16,7 @@ namespace AppTests.Entities
         public void New()
         {
             string name = "CD";
-            Abbreviation abbreviation = new Abbreviation(name, string.Empty, string.Empty);
+            Abbreviation abbreviation = new Abbreviation(name, string.Empty, Array.Empty<string>());
             IReadOnlyCollection<object> events = abbreviation.GetEvents();
             Assert.NotEmpty(events);
             Assert.Collection(events, (e) =>
@@ -39,7 +39,7 @@ namespace AppTests.Entities
                     LinkText = Guid.NewGuid().ToString()
                 }
             });
-            Abbreviation abbreviation = new Abbreviation(name, string.Empty, string.Empty);
+            Abbreviation abbreviation = new Abbreviation(name, string.Empty, Array.Empty<string>());
             abbreviation.ChangeLinks(cmd);
             var events = abbreviation.GetEvents();
             Assert.NotEmpty(events);
@@ -57,12 +57,12 @@ namespace AppTests.Entities
         [Fact]
         public void ChangeName()
         {
-            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, string.Empty);
+            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, new List<string>{ });
             abbreviation.ClearEvents();
             string oldFullName = abbreviation.LongForm;
-            string oldDescription = abbreviation.Description;
+            List<string> oldDescription = abbreviation.Description.ToList();
             string newFullName = Guid.NewGuid().ToString();
-            string newDescription = Guid.NewGuid().ToString();
+            List<string> newDescription = new List<string>() { Guid.NewGuid().ToString() };
             abbreviation.Change(new ChangeAbbreviationCmd(newFullName, newDescription));
             IReadOnlyCollection<object> events = abbreviation.GetEvents();
             Assert.Collection(events, (e) =>
@@ -82,7 +82,11 @@ namespace AppTests.Entities
             Config config = new Config();
             Abbreviation abbreviation = CdAbbreviation();
             List<string> markdown = abbreviation.Markdown(config).ToList();
-            foreach(string find in new string[] { abbreviation.ShortForm, abbreviation.LongForm, abbreviation.Description })
+            foreach(string find in new string[] { abbreviation.ShortForm, abbreviation.LongForm })
+            {
+                Assert.True(StringUtilities.Contains(markdown, find));
+            }
+            foreach(string find in abbreviation.Description)
             {
                 Assert.True(StringUtilities.Contains(markdown, find));
             }
@@ -107,7 +111,7 @@ namespace AppTests.Entities
         {
             Config config = new Config();
             Abbreviation abbreviation = CdAbbreviation();
-            string description = Guid.NewGuid().ToString();
+            List<string> description = new List<string>() { Guid.NewGuid().ToString() };
             abbreviation.Change(new ChangeAbbreviationCmd(abbreviation.LongForm, description));
             List<string> markdown = abbreviation.Markdown(config).ToList();
             Assert.True(StringUtilities.Contains(markdown, description));
@@ -196,11 +200,11 @@ namespace AppTests.Entities
         {
             string abbreviationString = "CD";
             string fullName = "Compact Disk";
-            string description = "A flat plate with optical data on it";
+            List<string> description = new List<string>() { "A flat plate with optical data on it" };
             List<App.Entities.Link> links = new List<App.Entities.Link>();
             links.Add(new App.Entities.Link($"https://{Guid.NewGuid()}.domain.com", Guid.NewGuid().ToString()));
             links.Add(new App.Entities.Link($"https://{Guid.NewGuid()}.domain.com", Guid.NewGuid().ToString()));
-            Abbreviation abbreviation = new Abbreviation(abbreviationString, string.Empty, string.Empty);
+            Abbreviation abbreviation = new Abbreviation(abbreviationString, string.Empty, Array.Empty<string>());
             abbreviation.Change(new App.Commands.ChangeAbbreviationCmd(fullName, description));
             abbreviation.ChangeLinks(new ChangeAbbreviationLinksCmd(links));
             return abbreviation;

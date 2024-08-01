@@ -15,12 +15,13 @@ namespace AppEvents
         public AbbreviationCreatedEvent(
             string shortForm,
             string longForm,
-            string description) 
+            IEnumerable<string> description) 
         { 
             ShortForm = shortForm;
             LongForm = longForm;
-            Description = description;
+            Description = description.ToList();
         }
+
         /// <summary>
         /// The abbreviatin name, for example CD
         /// for compact disk
@@ -35,6 +36,6 @@ namespace AppEvents
         /// <summary>
         /// The description
         /// </summary>
-        public string Description { get; private set; } = string.Empty;
+        public List<string> Description { get; private set; } = new List<string>();
     }
 }

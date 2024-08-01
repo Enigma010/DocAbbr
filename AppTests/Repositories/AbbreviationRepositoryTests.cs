@@ -21,7 +21,7 @@ namespace AppTests.Repositories
         [Fact]
         public async Task New()
         {
-            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, string.Empty);
+            Abbreviation abbreviation = new Abbreviation("CD", string.Empty, Array.Empty<string>());
             _dbClient.Setup(e => e.GetAsync<AbbreviationDto, string>(It.Is<string>(id => id == abbreviation.ShortForm))).ReturnsAsync(abbreviation.GetDto());
             Abbreviation dbAbbreviation = await _repository.GetAsync(abbreviation.Id);
             Assert.NotNull(dbAbbreviation);

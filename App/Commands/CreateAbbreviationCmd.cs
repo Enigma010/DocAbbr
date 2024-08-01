@@ -12,12 +12,21 @@ namespace App.Commands
     public class CreateAbbreviationCmd
     {
         /// <summary>
-        /// The create abbreviation command
+        /// Create abbreviation command
+        /// </summary>
+        public CreateAbbreviationCmd() { }
+
+        /// <summary>
+        /// Create abbreviation command
         /// </summary>
         /// <param name="shortForm">The abbreviation name</param>
-        public CreateAbbreviationCmd(string shortForm) 
+        public CreateAbbreviationCmd(string shortForm,
+            string longForm,
+            IEnumerable<string> description) 
         { 
             ShortForm = shortForm;
+            LongForm = longForm;
+            Description = description.ToList();
         }
 
         /// <summary>
@@ -33,6 +42,6 @@ namespace App.Commands
         /// <summary>
         /// The description
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public List<string> Description { get; set; } = new List<string>();
     }
 }

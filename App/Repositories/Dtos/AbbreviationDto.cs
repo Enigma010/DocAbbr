@@ -42,11 +42,11 @@ namespace App.Repositories.Dtos
         /// <summary>
         /// The description of the abbreviation
         /// </summary>
-        public string Description
+        public List<string> Description
         {
             get;
             set;
-        } = string.Empty;
+        } = new List<string>();
 
         /// <summary>
         /// The reference links

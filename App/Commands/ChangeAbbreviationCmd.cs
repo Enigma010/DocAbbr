@@ -16,18 +16,20 @@ namespace App.Commands
         /// </summary>
         /// <param name="longForm">The long form/param>
         /// <param name="description">The description</param>
-        public ChangeAbbreviationCmd(string longForm, string description)
+        public ChangeAbbreviationCmd(string longForm, IEnumerable<string> description)
         {
             LongForm = longForm;
-            Description = description;
+            Description = description.ToList();
         }
+
         /// <summary>
         /// The long form
         /// </summary>
         public string LongForm { get; set; } = string.Empty;
+
         /// <summary>
         /// The description
         /// </summary>
-        public string Description { get; set; } = string.Empty;
+        public List<string> Description { get; set; } = new List<string>();
     }
 }

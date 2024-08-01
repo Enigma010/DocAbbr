@@ -17,7 +17,7 @@ namespace AppEvents
         /// </summary>
         public AbbreviationDeletedEvent(string shortForm, 
             string longForm,
-            string description,
+            List<string> description,
             List<Tuple<string, string>> links) 
         { 
             ShortForm = shortForm;
@@ -44,11 +44,11 @@ namespace AppEvents
         /// <summary>
         /// The description
         /// </summary>
-        public string Description
+        public List<string> Description
         {
             get;
             private set;
-        }
+        } = new List<string>();
         /// <summary>
         /// The reference links
         /// </summary>

@@ -20,13 +20,13 @@ namespace AppEvents
         /// <param name="newDescription"></param>
         public AbbreviationChangedEvent(string oldFullName, 
             string newFullName,
-            string oldDescription,
-            string newDescription) 
+            IEnumerable<string> oldDescription,
+            IEnumerable<string> newDescription) 
         { 
             OldFullName = oldFullName;
             NewFullName = newFullName;
-            OldDescription = oldDescription;
-            NewDescription = newDescription;
+            OldDescription = oldDescription.ToList();
+            NewDescription = newDescription.ToList();
         }
         /// <summary>
         /// The new full name
@@ -39,10 +39,10 @@ namespace AppEvents
         /// <summary>
         /// The old description
         /// </summary>
-        public string OldDescription { get; private set; } = string.Empty;
+        public List<string> OldDescription { get; private set; } = new List<string>();
         /// <summary>
         /// The new description
         /// </summary>
-        public string NewDescription { get; private set; } = string.Empty;
+        public List<string> NewDescription { get; private set; } = new List<string>();
     }
 }
