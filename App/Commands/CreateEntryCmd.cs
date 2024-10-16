@@ -7,25 +7,30 @@ using System.Threading.Tasks;
 namespace App.Commands
 {
     /// <summary>
-    /// Change a abbreviation command
+    /// Create entry command
     /// </summary>
-    public class ChangeAbbreviationCmd
+    public class CreateEntryCmd
     {
         /// <summary>
-        /// Creates a change abbreviation command
+        /// Create entry command
         /// </summary>
-        /// <param name="longForm">The long form/param>
-        /// <param name="description">The description</param>
-        public ChangeAbbreviationCmd(string longForm, IEnumerable<string> description)
-        {
-            LongForm = longForm;
+        public CreateEntryCmd() { }
+
+        /// <summary>
+        /// Create entry command
+        /// </summary>
+        /// <param name="name">The entry name</param>
+        public CreateEntryCmd(string name,
+            IEnumerable<string> description) 
+        { 
+            Name = name;
             Description = description.ToList();
         }
 
         /// <summary>
-        /// The long form
+        /// The name
         /// </summary>
-        public string LongForm { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The description

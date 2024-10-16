@@ -1,34 +1,29 @@
 ﻿using App.Commands;
 using App.Entities;
 using App.Repositories;
+using App.Repositories.Dtos;
 using AppCore.Services;
 using EventBus;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnitOfWork;
 using Logging;
 using Markdown;
-using App.Repositories.Dtos;
+using Microsoft.Extensions.Logging;
+using UnitOfWork;
 
 namespace App.Services
 {
-    public interface IAbbreviationService : IBaseService<Abbreviation, string>
+    public interface IEntryService : IBaseService<Entry, string>
     {
-        Task<Abbreviation> CreateAsync(CreateAbbreviationCmd cmd);
-        Task<Abbreviation> GetAsync(string shortForm);
-        Task<IEnumerable<Abbreviation>> GetAsync();
+        Task<Entry> CreateAsync(CreateEntryCmd cmd);
+        Task<Entry> GetAsync(string name);
+        Task<IEnumerable<Entry>> GetAsync();
         Task DeleteAsync(string shortForm);
-        Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd cmd);
-        Task<Abbreviation> ChangeLinksAsync(string shortForm, ChangeAbbreviationLinksCmd cmd);
+        Task<Entry> ChangeAsync(string shortForm, ChangeEntryCmd cmd);
+        Task<Entry> ChangeLinksAsync(string shortForm, ChangeEntryLinksCmd cmd);
         Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId);
         Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId);
 
     }
-    public class AbbreviationService : BaseService<IAbbreviationRepository, Abbreviation, AbbreviationDto, string>, IAbbreviationService
+    public class EntryService : BaseService<IEntryRepository, Entry, EntryDto, string>, IEntryService
     {
         private readonly IConfigService _configService;
         private readonly IMarkdownClient _markdownClient;
@@ -37,9 +32,9 @@ namespace App.Services
         /// </summary>
         /// <param name="repository">The repository</param>
         /// <param name="logger">The logger</param>
-        public AbbreviationService(
-            IAbbreviationRepository repository,
-            ILogger<IAbbreviationService> logger,
+        public EntryService(
+            IEntryRepository repository,
+            ILogger<IEntryService> logger,
             IConfigService configService,
             IMarkdownClient markdownClient,
             IEventPublisher eventPublisher)
@@ -54,7 +49,7 @@ namespace App.Services
         /// </summary>
         /// <param name="cmd">The create config command</param>
         /// <returns>The new configuration object</returns>
-        public async Task<Abbreviation> CreateAsync(CreateAbbreviationCmd cmd)
+        public async Task<Entry> CreateAsync(CreateEntryCmd cmd)
         {
             using (_logger.LogCaller())
             {
@@ -62,21 +57,21 @@ namespace App.Services
                 {
                     return await unitOfWorks.RunAsync(async () =>
                     {
-                        Abbreviation abbreviation = new Abbreviation(cmd.ShortForm, cmd.LongForm, cmd.Description);
-                        await _repository.InsertAsync(abbreviation);
-                        await PublishEvents(abbreviation);
-                        return abbreviation;
+                        Entry entry = new Entry(cmd.Name, cmd.Description);
+                        await _repository.InsertAsync(entry);
+                        await PublishEvents(entry);
+                        return entry;
                     });
                 }
             }
         }
 
         /// <summary>
-        /// Deletes a configuration
+        /// Deletes a entry
         /// </summary>
-        /// <param name="shortForm">The short form of the abbreviation</param>
+        /// <param name="name">The name of the entry/param>
         /// <returns></returns>
-        public async Task DeleteAsync(string shortForm)
+        public async Task DeleteAsync(string name)
         {
             using (_logger.LogCaller())
             {
@@ -84,9 +79,9 @@ namespace App.Services
                 {
                     await unitOfWorks.RunAsync(async () =>
                     {
-                        Abbreviation abbreviation = await _repository.GetAsync(shortForm);
-                        await _repository.DeleteAsync(abbreviation);
-                        await PublishEvents(abbreviation);
+                        Entry entry = await _repository.GetAsync(name);
+                        await _repository.DeleteAsync(entry);
+                        await PublishEvents(entry);
                         await unitOfWorks.Commit();
                     });
                 }
@@ -96,13 +91,13 @@ namespace App.Services
         /// <summary>
         /// Gets a configuration
         /// </summary>
-        /// <param name="shortForm">The short form of the abbreviation</param>
+        /// <param name="name">The name of the entry</param>
         /// <returns></returns>
-        public async Task<Abbreviation> GetAsync(string shortForm)
+        public async Task<Entry> GetAsync(string name)
         {
             using (_logger.LogCaller())
             {
-                return await _repository.GetAsync(shortForm);
+                return await _repository.GetAsync(name);
             }
         }
 
@@ -110,7 +105,7 @@ namespace App.Services
         /// Gets all of the configurations
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Abbreviation>> GetAsync()
+        public async Task<IEnumerable<Entry>> GetAsync()
         {
             using (_logger.LogCaller())
             {
@@ -119,54 +114,54 @@ namespace App.Services
         }
 
         /// <summary>
-        /// Changes or updates an abbreviation
+        /// Changes or updates an entry
         /// </summary>
-        /// <param name="shortForm">The short form of the abbreviation</param>
+        /// <param name="name">The name of the entry</param>
         /// <param name="cmd">The change that is occurring</param>
-        /// <returns>The updated abbreviation</returns>
-        public async Task<Abbreviation> ChangeAsync(string shortForm, ChangeAbbreviationCmd cmd)
+        /// <returns>The updated entry</returns>
+        public async Task<Entry> ChangeAsync(string name, ChangeEntryCmd cmd)
         {
-            return await ChangeAsync(shortForm, (abbreviation) =>
+            return await ChangeAsync(name, (entry) =>
             {
-                abbreviation.Change(cmd);
-                return abbreviation;
+                entry.Change(cmd);
+                return entry;
             });
         }
         /// <summary>
-        /// Changes or updates an abbreviation links
+        /// Changes or updates an entry links
         /// </summary>
-        /// <param name="shortForm">The short form of the abbreviation</param>
+        /// <param name="name">The name of the entry</param>
         /// <param name="cmd">The change that is occurring</param>
-        /// <returns>The updated abbreviation</returns>
-        public async Task<Abbreviation> ChangeLinksAsync(string shortForm, ChangeAbbreviationLinksCmd cmd)
+        /// <returns>The updated entry</returns>
+        public async Task<Entry> ChangeLinksAsync(string name, ChangeEntryLinksCmd cmd)
         {
-            return await ChangeAsync(shortForm, (abbreviation) =>
+            return await ChangeAsync(name, (entry) =>
             {
-                abbreviation.ChangeLinks(cmd);
-                return abbreviation;
+                entry.ChangeLinks(cmd);
+                return entry;
             });
         }
         /// <summary>
         /// Converts the markdown to HTML
         /// </summary>
-        /// <param name="shortForm"></param>
+        /// <param name="name">The name of the entry</param>
         /// <param name="configurationId"></param>
         /// <returns></returns>
-        public async Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId)
+        public async Task<List<string>> GetMarkdownAsync(string name, Guid configurationId)
         {
-            Abbreviation abbreviation = await GetAsync(shortForm);
+            Entry entry = await GetAsync(name);
             Config config = await _configService.GetAsync(configurationId);
-            return abbreviation.Markdown(config).ToList();
+            return entry.Markdown(config).ToList();
         }
         /// <summary>
         /// Converts the markdown to HTML
         /// </summary>
-        /// <param name="shortForm"></param>
+        /// <param name="name">The name of the entry</param>
         /// <param name="configurationId"></param>
         /// <returns></returns>
-        public async Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId)
+        public async Task<List<string>> GetHtmlAsync(string name, Guid configurationId)
         {
-            List<string> markdown = await GetMarkdownAsync(shortForm, configurationId);
+            List<string> markdown = await GetMarkdownAsync(name, configurationId);
             string html = _markdownClient.ToHtml(string.Join("\n", markdown));
             return html.Split("\n").ToList(); 
         }

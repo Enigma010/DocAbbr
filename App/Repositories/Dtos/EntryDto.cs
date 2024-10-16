@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 
 namespace App.Repositories.Dtos
 {
-    public class AbbreviationDto : EntityDto<string>
+    public class EntryDto : EntityDto<string>
     {
         /// <summary>
-        /// Creates a new abbreviation
+        /// Creates a new entry
         /// </summary>
         /// <param name="getNewId"></param>
-        public AbbreviationDto(Func<string> getNewId) : base(getNewId)
+        public EntryDto(Func<string> getNewId) : base(getNewId)
         {
         }
 
         /// <summary>
-        /// Gets the short form of the abbreviation, for example CD
+        /// Gets the short form of the entry, for example CD
         /// for compact disk
         /// </summary>
-        public string ShortForm
+        public string Name
         {
             get
             {
@@ -30,17 +30,7 @@ namespace App.Repositories.Dtos
         }
 
         /// <summary>
-        /// Gets the long form of the abbreviation, for example
-        /// compact disk for CD
-        /// </summary>
-        public string LongForm
-        {
-            get;
-            set;
-        } = string.Empty;
-
-        /// <summary>
-        /// The description of the abbreviation
+        /// The description of the entry
         /// </summary>
         public List<string> Description
         {
@@ -56,6 +46,7 @@ namespace App.Repositories.Dtos
             get;
             set;
         } = new List<LinkDto>();
+
         /// <summary>
         /// The markdown reference link
         /// </summary>

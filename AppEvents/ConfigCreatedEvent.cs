@@ -26,6 +26,7 @@
         /// The ID of the config
         /// </summary>
         public Guid Id { get; set; } = Guid.Empty;
+
         /// <summary>
         /// The name of the configuration
         /// </summary>
@@ -34,6 +35,7 @@
             get;
             set;
         } = string.Empty;
+        
         /// <summary>
         /// The markdown
         /// </summary>
@@ -42,6 +44,7 @@
             get;
             set;
         } = new List<string>();
+        
         /// <summary>
         /// The markdown for a reference link
         /// </summary>

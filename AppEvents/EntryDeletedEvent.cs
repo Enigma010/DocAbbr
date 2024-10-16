@@ -8,39 +8,47 @@ using System.Threading.Tasks;
 namespace AppEvents
 {
     /// <summary>
-    /// Abbreviation deleted
+    /// Entry deleted
     /// </summary>
-    public class AbbreviationDeletedEvent
+    public class EntryDeletedEvent
     {
         /// <summary>
-        /// Create Abbreviation deleted event
+        /// Create entry deleted event
         /// </summary>
-        public AbbreviationDeletedEvent(string shortForm, 
-            string longForm,
+        /// <param name="id">The ID</param>
+        /// <param name="name">The name of the entry</param>
+        /// <param name="description">The description of the entry</param>
+        /// <param name="links">the links to the entry</param>
+        public EntryDeletedEvent(
+            string id,
+            string name, 
             List<string> description,
             List<Tuple<string, string>> links) 
-        { 
-            ShortForm = shortForm;
-            LongForm = longForm;
+        {
+            Id = id;
+            Name = name;
             Description = description;
             links.ForEach(link => ReferenceLinks.Add(new Link(link.Item1, link.Item2)));
         }
+
+        /// <summary>
+        /// The ID
+        /// </summary>
+        public string Id
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// The short form
         /// </summary>
-        public string ShortForm
+        public string Name
         {
             get;
             private set;
         }
-        /// <summary>
-        /// The long form
-        /// </summary>
-        public string LongForm 
-        { 
-            get; 
-            private set; 
-        }
+
         /// <summary>
         /// The description
         /// </summary>
@@ -49,6 +57,7 @@ namespace AppEvents
             get;
             private set;
         } = new List<string>();
+
         /// <summary>
         /// The reference links
         /// </summary>

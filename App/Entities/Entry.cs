@@ -15,54 +15,45 @@ using System.Threading.Tasks;
 namespace App.Entities
 {
     /// <summary>
-    /// An abbreviation
+    /// An entry
     /// </summary>
-    public class Abbreviation : Entity<AbbreviationDto, string>
+    public class Entry : Entity<EntryDto, string>
     {
         /// <summary>
-        /// Creates a default abbreviation
+        /// Creates a default entry
         /// </summary>
-        public Abbreviation() : base(() => { return string.Empty;  })
+        public Entry() : base(() => { return string.Empty;  })
         {
         }
 
         /// <summary>
-        /// Creates an abbreviation
+        /// Creates an entry
         /// </summary>
         /// <param name="dto">The data transfer object</param>
-        public Abbreviation(AbbreviationDto dto): base(dto) 
+        public Entry(EntryDto dto): base(dto) 
         { 
         }
 
         /// <summary>
-        /// Creates a new description
+        /// Creates a new entry
         /// </summary>
-        /// <param name="shortForm">The short form, i.e. cd</param>
-        /// <param name="longForm">The long form, i.e. compact disk</param>
+        /// <param name="name">The short form, i.e. cd</param>
         /// <param name="description">The description</param>
-        public Abbreviation(string shortForm, 
-            string longForm, 
-            IEnumerable<string> description) : base(() => { return shortForm; })
+        public Entry(string name, 
+            IEnumerable<string> description) : base(() => { return name; })
         {
-            _dto.LongForm = longForm;
             _dto.Description = description.ToList();
-            AddEvent(new AbbreviationCreatedEvent(shortForm, longForm, description));
+            AddEvent(new EntryCreatedEvent(Id, name, description));
         }
 
         /// <summary>
-        /// Gets the short form of the abbreviation, for example CD
+        /// Gets the name of the entry, for example CD
         /// for compact disk
         /// </summary>
-        public string ShortForm => _dto.Id;
-
-        /// <summary>
-        /// Gets the long form of the abbreviation, for example
-        /// compact disk for CD
-        /// </summary>
-        public string LongForm => _dto.LongForm;
+        public string Name => _dto.Id;
         
         /// <summary>
-        /// The description of the abbreviation
+        /// The description of the entry
         /// </summary>
         public IReadOnlyCollection<string> Description => _dto.Description.AsReadOnly();
         
@@ -72,31 +63,30 @@ namespace App.Entities
         public IReadOnlyCollection<Link> ReferenceLinks => _dto.ReferenceLinks.Select(rl => new Link(rl)).ToList().AsReadOnly();
         
         /// <summary>
-        /// Changes an abbreviation
+        /// Changes an entry
         /// </summary>
-        /// <param name="cmd">The change abbreviation command</param>
-        public void Change(ChangeAbbreviationCmd cmd)
+        /// <param name="cmd">The change entry command</param>
+        public void Change(ChangeEntryCmd cmd)
         {
-            if (LongForm != cmd.LongForm || Description != cmd.Description)
+            if (Description != cmd.Description)
             {
-                AddEvent(new AbbreviationChangedEvent(LongForm, cmd.LongForm, Description, cmd.Description));
-                _dto.LongForm = cmd.LongForm;
+                AddEvent(new EntryChangedEvent(Id, Name, Description, cmd.Description));
                 _dto.Description = cmd.Description;
             }
         }
         
         /// <summary>
-        /// Changes the links related to the abbreviation
+        /// Changes the links related to the entry
         /// </summary>
         /// <param name="newReferenceLinks"></param>
-        public void ChangeLinks(ChangeAbbreviationLinksCmd cmd)
+        public void ChangeLinks(ChangeEntryLinksCmd cmd)
         {
             List<LinkDto> addedReferenceLinks = LinkDto.Added(_dto.ReferenceLinks, cmd.Links).ToList();
             List<LinkDto> changedReferenceLinks = LinkDto.Changed(_dto.ReferenceLinks, cmd.Links).ToList();
             List<LinkDto> deletedReferenceLinks = LinkDto.Deleted(_dto.ReferenceLinks, cmd.Links).ToList();
             if (addedReferenceLinks.Count > 0 || changedReferenceLinks.Count > 0 || deletedReferenceLinks.Count > 0)
             {
-                AddEvent(new AbbreviationReferenceLinksChangedEvent(addedReferenceLinks.Map(), changedReferenceLinks.Map(), deletedReferenceLinks.Map()));
+                AddEvent(new EntryReferenceLinksChangedEvent(addedReferenceLinks.Map(), changedReferenceLinks.Map(), deletedReferenceLinks.Map()));
                 _dto.ReferenceLinks.Clear();
                 _dto.ReferenceLinks.AddRange(cmd.Links.Select(link => new LinkDto(link.Url, link.LinkText)));
             }
@@ -110,8 +100,7 @@ namespace App.Entities
         public IEnumerable<string> Markdown(Config config)
         {
             StringBuilder markdown = new StringBuilder(string.Join('\n', config.Markdown));
-            markdown = markdown.Replace(Config.ShortFormTemplate, ShortForm);
-            markdown = markdown.Replace(Config.LongFormTemplate, LongForm);
+            markdown = markdown.Replace(Config.NameTemplate, Name);
             markdown = markdown.Replace(Config.DescriptionTemplate, string.Join('\n', Description));
             StringBuilder referenceLinksMarkdown = new StringBuilder();
             if (!string.IsNullOrEmpty(config.MarkdownReferenceLink))
@@ -129,13 +118,13 @@ namespace App.Entities
         }
 
         /// <summary>
-        /// Delete an abbreviation
+        /// Delete an entry
         /// </summary>
         public override void Deleted()
         {
-            AddEvent(new AbbreviationDeletedEvent(
-                _dto.ShortForm,
-                _dto.LongForm,
+            AddEvent(new EntryDeletedEvent(
+                _dto.Id,
+                _dto.Name,
                 _dto.Description,
                 _dto.ReferenceLinks.Select(
                     rl => 

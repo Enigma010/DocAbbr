@@ -13,6 +13,7 @@
         {
             Id = id;
         }
+
         /// <summary>
         /// The ID of the config
         /// </summary>

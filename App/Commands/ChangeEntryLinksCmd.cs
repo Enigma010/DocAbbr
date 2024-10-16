@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 namespace App.Commands
 {
     /// <summary>
-    /// Change abbreviation links command
+    /// Change entry links command
     /// </summary>
-    public class ChangeAbbreviationLinksCmd
+    public class ChangeEntryLinksCmd
     {
         /// <summary>
-        /// Create a change abbreviation links command
+        /// Create a change entry links command
         /// </summary>
-        public ChangeAbbreviationLinksCmd() { }
+        public ChangeEntryLinksCmd() { }
 
         /// <summary>
-        /// Creates a change abbreviatino links command
+        /// Creates a change entry links command
         /// </summary>
         /// <param name="links"></param>
-        public ChangeAbbreviationLinksCmd(IEnumerable<IReadableLink> links)
+        public ChangeEntryLinksCmd(IEnumerable<IReadableLink> links)
         {
             links.ToList().ForEach(link => Links.Add(new ChangeLinkCmd() 
             { 

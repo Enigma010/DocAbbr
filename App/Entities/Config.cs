@@ -11,8 +11,7 @@ namespace App.Entities
     /// </summary>
     public class Config : Entity<ConfigDto, Guid>
     {
-        public const string ShortFormTemplate = "{{shortForm}}";
-        public const string LongFormTemplate = "{{longForm}}";
+        public const string NameTemplate = "{{name}}";
         public const string DescriptionTemplate = "{{description}}";
         public const string ReferenceLinksTemplate = "{{referenceLinks}}";
         public const string ReferenceLinkNameTemplate = "{{referenceLinkName}}";
@@ -55,7 +54,7 @@ namespace App.Entities
         public bool Enabled => _dto.Enabled;
         
         /// <summary>
-        /// The markdown for an abbreviation
+        /// The markdown for an entry
         /// </summary>
         public IReadOnlyCollection<string> Markdown => (_dto.Markdown ?? new List<string>()).AsReadOnly();
         
@@ -103,7 +102,7 @@ namespace App.Entities
         {
             if (!Markdown.Same(cmd.Markdown) || MarkdownReferenceLink != cmd.MarkdownReferenceLink)
             {
-                AddEvent(new ConfigMarkdownTemplateChangedEvent(Markdown, cmd.Markdown, MarkdownReferenceLink, cmd.MarkdownReferenceLink));
+                AddEvent(new ConfigMarkdownTemplateChangedEvent(Id, Markdown, cmd.Markdown, MarkdownReferenceLink, cmd.MarkdownReferenceLink));
                 _dto.Markdown.Clear();
                 _dto.Markdown.AddRange(cmd.Markdown);
                 _dto.MarkdownReferenceLink = cmd.MarkdownReferenceLink;
@@ -111,16 +110,14 @@ namespace App.Entities
         }
         
         /// <summary>
-        /// The default markdown template for the entire abbreviation
+        /// The default markdown template for the entire entry
         /// </summary>
         /// <returns>The default markdown template</returns>
         public static List<string> MarkdownTemplate()
         {
             return new List<string>()
             {
-                $"# {ShortFormTemplate}",
-                $"## Full Name",
-                $"{LongFormTemplate}",
+                $"# {NameTemplate}",
                 $"## Description",
                 $"{DescriptionTemplate}",
                 $"## References",
