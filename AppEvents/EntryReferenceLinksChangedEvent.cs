@@ -9,7 +9,7 @@ namespace AppEvents
     /// <summary>
     /// Abbreviation links changed event
     /// </summary>
-    public class AbbreviationReferenceLinksChangedEvent
+    public class EntryReferenceLinksChangedEvent
     {
         /// <summary>
         /// Create abbreviation links changed event
@@ -17,7 +17,7 @@ namespace AppEvents
         /// <param name="addedReferenceLinks">The links added</param>
         /// <param name="changedReferenceLinks">The links changed</param>
         /// <param name="deletedReferenceLinks">The links deleted</param>
-        public AbbreviationReferenceLinksChangedEvent(IEnumerable<Link> addedReferenceLinks, 
+        public EntryReferenceLinksChangedEvent(IEnumerable<Link> addedReferenceLinks, 
             IEnumerable<Link> changedReferenceLinks, 
             IEnumerable<Link> deletedReferenceLinks) 
         {

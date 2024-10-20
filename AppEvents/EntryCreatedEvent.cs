@@ -6,32 +6,36 @@ using System.Threading.Tasks;
 
 namespace AppEvents
 {
-    public class AbbreviationCreatedEvent
+    public class EntryCreatedEvent
     {
         /// <summary>
         /// Abbreviation created
         /// </summary>
-        /// <param name="shortForm">The abbreviatino name</param>
-        public AbbreviationCreatedEvent(
-            string shortForm,
-            string longForm,
+        /// <param name="name">The entry name</param>
+        public EntryCreatedEvent(
+            string id,
+            string name,
             IEnumerable<string> description) 
-        { 
-            ShortForm = shortForm;
-            LongForm = longForm;
+        {
+            Id = id;
+            Name = name;
             Description = description.ToList();
         }
 
         /// <summary>
-        /// The abbreviatin name, for example CD
-        /// for compact disk
+        /// The ID
         /// </summary>
-        public string ShortForm { get; private set; } = string.Empty;
+        public string Id 
+        { 
+            get; 
+            set; 
+        }
 
         /// <summary>
-        /// The long form, for example compact disk
+        /// The entry name, for example CD
+        /// for compact disk
         /// </summary>
-        public string LongForm { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
 
         /// <summary>
         /// The description

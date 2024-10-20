@@ -9,37 +9,45 @@ namespace AppEvents
     /// <summary>
     /// Abbreviation changed event
     /// </summary>
-    public class AbbreviationChangedEvent
+    public class EntryChangedEvent
     {
         /// <summary>
         /// Create abbreviation changed event
         /// </summary>
-        /// <param name="oldFullName"></param>
-        /// <param name="newFullName"></param>
+        /// <param name="id">The ID</param>
         /// <param name="oldDescription"></param>
         /// <param name="newDescription"></param>
-        public AbbreviationChangedEvent(string oldFullName, 
-            string newFullName,
+        public EntryChangedEvent(
+            string id,
+            string name,
             IEnumerable<string> oldDescription,
             IEnumerable<string> newDescription) 
-        { 
-            OldFullName = oldFullName;
-            NewFullName = newFullName;
+        {
+            Id = id;
+            Name = name;
             OldDescription = oldDescription.ToList();
             NewDescription = newDescription.ToList();
         }
+
         /// <summary>
-        /// The new full name
+        /// The ID
         /// </summary>
-        public string NewFullName { get; private set; } = string.Empty;
+        public string Id 
+        { 
+            get; 
+            set; 
+        }
+
         /// <summary>
-        /// The old full name
+        /// The name of the entry
         /// </summary>
-        public string OldFullName { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
+        
         /// <summary>
         /// The old description
         /// </summary>
         public List<string> OldDescription { get; private set; } = new List<string>();
+        
         /// <summary>
         /// The new description
         /// </summary>
