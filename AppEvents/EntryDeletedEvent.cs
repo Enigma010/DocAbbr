@@ -18,17 +18,14 @@ namespace AppEvents
         /// <param name="id">The ID</param>
         /// <param name="name">The name of the entry</param>
         /// <param name="description">The description of the entry</param>
-        /// <param name="links">the links to the entry</param>
         public EntryDeletedEvent(
             string id,
             string name, 
-            List<string> description,
-            List<Tuple<string, string>> links) 
+            List<string> description) 
         {
             Id = id;
             Name = name;
             Description = description;
-            links.ForEach(link => ReferenceLinks.Add(new Link(link.Item1, link.Item2)));
         }
 
         /// <summary>
@@ -57,14 +54,5 @@ namespace AppEvents
             get;
             private set;
         } = new List<string>();
-
-        /// <summary>
-        /// The reference links
-        /// </summary>
-        public List<Link> ReferenceLinks
-        {
-            get;
-            private set;
-        } = new List<Link>();
     }
 }

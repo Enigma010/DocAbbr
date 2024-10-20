@@ -35,6 +35,7 @@ namespace AppTests.Services
                 _markdownClient,
                 _eventPublisher.Object);
         }
+
         [Fact]
         public async Task Create()
         {
@@ -43,6 +44,7 @@ namespace AppTests.Services
             Assert.Equal(shortForm, abbreviation.Name);
             _repository.Verify(e => e.InsertAsync(It.Is<Entry>(a => a.Id == shortForm)), Times.Once);
         }
+
         [Fact]
         public async Task Get()
         {
@@ -52,6 +54,7 @@ namespace AppTests.Services
             Entry dbAbbreviation = await _service.GetAsync(name);
             Assert.Equal(abbreviation, dbAbbreviation);
         }
+
         [Fact]
         public async Task GetAll()
         {
@@ -65,6 +68,7 @@ namespace AppTests.Services
             List<Entry> dbAbbreviations = (await _service.GetAsync()).ToList();
             Assert.Equal(dbAbbreviations, abbreviations);
         }
+
         [Fact]
         public async Task Delete()
         {
@@ -74,6 +78,7 @@ namespace AppTests.Services
             await _service.DeleteAsync(shortForm);
             _repository.Verify(x => x.DeleteAsync(It.Is<Entry>(a => a.Name == shortForm)), Times.Once());
         }
+
         [Fact]
         public async Task Change()
         {
@@ -87,6 +92,7 @@ namespace AppTests.Services
             Assert.Equal(newDescription, dbEntry.Description);
             _repository.Verify(x => x.UpdateAsync(It.Is<Entry>(a => a.Name == name)), Times.Once());
         }
+
         [Fact]
         public async Task Markdown()
         {
@@ -94,8 +100,9 @@ namespace AppTests.Services
             Config config;
             (config, abbreviation) = SetupMarkdownHtmlTest();
             List<string> markdown = await _service.GetMarkdownAsync(abbreviation.Name, config.Id);
-            AssertAbbreviationInStrings(markdown, abbreviation);
+            Assert.True(StringUtilities.Contains(markdown, "# cd"));
         }
+
         [Fact]
         public async Task Html()
         {
@@ -103,34 +110,19 @@ namespace AppTests.Services
             Config config;
             (config, abbreviation) = SetupMarkdownHtmlTest();
             List<string> html = await _service.GetHtmlAsync(abbreviation.Name, config.Id);
-            AssertAbbreviationInStrings(html, abbreviation);
             Assert.True(StringUtilities.Contains(html, "<h1>"));
         }
+
         private (Config, Entry) SetupMarkdownHtmlTest()
         {
             Config config = new Config();
-            List<Link> links = new List<Link>()
-            {
-                new Link($"https://{Guid.NewGuid()}.com", $"{Guid.NewGuid()}"),
-                new Link($"https://{Guid.NewGuid()}.com", $"{Guid.NewGuid()}"),
-            };
             _configService.Setup(x => x.GetAsync(It.Is<Guid>(id => id == config.Id))).ReturnsAsync(config);
             Entry abbreviation = new Entry("cd", Array.Empty<string>());
             abbreviation.Change(new ChangeEntryCmd(
                 description: new List<string>() { "An opticial disk with encoded data" }
             ));
-            abbreviation.ChangeLinks(new ChangeEntryLinksCmd(links));
             _repository.Setup(x => x.GetAsync(It.Is<string>(id => id == abbreviation.Id))).ReturnsAsync(abbreviation);
             return (config, abbreviation);
-        }
-        private void AssertAbbreviationInStrings(IEnumerable<string> strings, Entry abbreviation)
-        {
-            Assert.True(StringUtilities.Contains(strings, abbreviation.Name));
-            foreach (var link in abbreviation.ReferenceLinks)
-            {
-                Assert.True(StringUtilities.Contains(strings, link.Url));
-                Assert.True(StringUtilities.Contains(strings, link.LinkText));
-            }
         }
     }
 }

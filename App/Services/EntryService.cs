@@ -18,7 +18,6 @@ namespace App.Services
         Task<IEnumerable<Entry>> GetAsync();
         Task DeleteAsync(string shortForm);
         Task<Entry> ChangeAsync(string shortForm, ChangeEntryCmd cmd);
-        Task<Entry> ChangeLinksAsync(string shortForm, ChangeEntryLinksCmd cmd);
         Task<List<string>> GetMarkdownAsync(string shortForm, Guid configurationId);
         Task<List<string>> GetHtmlAsync(string shortForm, Guid configurationId);
 
@@ -127,20 +126,7 @@ namespace App.Services
                 return entry;
             });
         }
-        /// <summary>
-        /// Changes or updates an entry links
-        /// </summary>
-        /// <param name="name">The name of the entry</param>
-        /// <param name="cmd">The change that is occurring</param>
-        /// <returns>The updated entry</returns>
-        public async Task<Entry> ChangeLinksAsync(string name, ChangeEntryLinksCmd cmd)
-        {
-            return await ChangeAsync(name, (entry) =>
-            {
-                entry.ChangeLinks(cmd);
-                return entry;
-            });
-        }
+
         /// <summary>
         /// Converts the markdown to HTML
         /// </summary>
@@ -153,6 +139,7 @@ namespace App.Services
             Config config = await _configService.GetAsync(configurationId);
             return entry.Markdown(config).ToList();
         }
+
         /// <summary>
         /// Converts the markdown to HTML
         /// </summary>

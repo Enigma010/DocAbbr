@@ -14,13 +14,11 @@
         /// <param name="markdown">The markdown</param>
         public ConfigCreatedEvent(Guid id, 
             string name, 
-            IEnumerable<string> markdown, 
-            string markdownReferenceLink)
+            IEnumerable<string> markdown)
         {
             Id = id;
             Name = name;
             Markdown = markdown.ToList();
-            MarkdownReferenceLink = markdownReferenceLink;
         }
         /// <summary>
         /// The ID of the config
@@ -44,14 +42,5 @@
             get;
             set;
         } = new List<string>();
-        
-        /// <summary>
-        /// The markdown for a reference link
-        /// </summary>
-        public string MarkdownReferenceLink
-        {
-            get;
-            set;
-        } = string.Empty;
     }
 }

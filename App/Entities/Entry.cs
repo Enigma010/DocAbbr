@@ -58,11 +58,6 @@ namespace App.Entities
         public IReadOnlyCollection<string> Description => _dto.Description.AsReadOnly();
         
         /// <summary>
-        /// The reference links
-        /// </summary>
-        public IReadOnlyCollection<Link> ReferenceLinks => _dto.ReferenceLinks.Select(rl => new Link(rl)).ToList().AsReadOnly();
-        
-        /// <summary>
         /// Changes an entry
         /// </summary>
         /// <param name="cmd">The change entry command</param>
@@ -72,23 +67,6 @@ namespace App.Entities
             {
                 AddEvent(new EntryChangedEvent(Id, Name, Description, cmd.Description));
                 _dto.Description = cmd.Description;
-            }
-        }
-        
-        /// <summary>
-        /// Changes the links related to the entry
-        /// </summary>
-        /// <param name="newReferenceLinks"></param>
-        public void ChangeLinks(ChangeEntryLinksCmd cmd)
-        {
-            List<LinkDto> addedReferenceLinks = LinkDto.Added(_dto.ReferenceLinks, cmd.Links).ToList();
-            List<LinkDto> changedReferenceLinks = LinkDto.Changed(_dto.ReferenceLinks, cmd.Links).ToList();
-            List<LinkDto> deletedReferenceLinks = LinkDto.Deleted(_dto.ReferenceLinks, cmd.Links).ToList();
-            if (addedReferenceLinks.Count > 0 || changedReferenceLinks.Count > 0 || deletedReferenceLinks.Count > 0)
-            {
-                AddEvent(new EntryReferenceLinksChangedEvent(addedReferenceLinks.Map(), changedReferenceLinks.Map(), deletedReferenceLinks.Map()));
-                _dto.ReferenceLinks.Clear();
-                _dto.ReferenceLinks.AddRange(cmd.Links.Select(link => new LinkDto(link.Url, link.LinkText)));
             }
         }
         
@@ -103,17 +81,6 @@ namespace App.Entities
             markdown = markdown.Replace(Config.NameTemplate, Name);
             markdown = markdown.Replace(Config.DescriptionTemplate, string.Join('\n', Description));
             StringBuilder referenceLinksMarkdown = new StringBuilder();
-            if (!string.IsNullOrEmpty(config.MarkdownReferenceLink))
-            {
-                foreach (var referenceLink in _dto.ReferenceLinks)
-                {
-                    referenceLinksMarkdown.Append(
-                        config.MarkdownReferenceLink.Replace(
-                            Config.ReferenceLinkNameTemplate, 
-                            referenceLink.LinkText).Replace(Config.ReferenceLinkTemplate, referenceLink.Url) + "\n");
-                }
-                markdown = markdown.Replace(Config.ReferenceLinksTemplate, referenceLinksMarkdown.ToString());
-            }
             return markdown.ToString().Split('\n');
         }
 
@@ -125,12 +92,7 @@ namespace App.Entities
             AddEvent(new EntryDeletedEvent(
                 _dto.Id,
                 _dto.Name,
-                _dto.Description,
-                _dto.ReferenceLinks.Select(
-                    rl => 
-                    new Tuple<string, string>(
-                        rl.Url, 
-                        rl.LinkText)).ToList()));
+                _dto.Description));
         }
     }
 }

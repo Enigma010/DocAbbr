@@ -20,15 +20,11 @@ namespace AppEvents
         public ConfigMarkdownTemplateChangedEvent(
             Guid id,
             IEnumerable<string> oldMarkdown,
-            IEnumerable<string> newMarkdown, 
-            string oldMarkdownReferenceLink,
-            string newMarkdownReferenceLink)
+            IEnumerable<string> newMarkdown)
         {
             Id = id;
             OldMarkdown = oldMarkdown.ToList();
             NewMarkdown = newMarkdown.ToList();
-            OldMarkdownReferenceLink = oldMarkdownReferenceLink;
-            NewMarkdownReferenceLink = newMarkdownReferenceLink;
         }
 
         /// <summary>
@@ -48,6 +44,7 @@ namespace AppEvents
             get;
             set;
         } = new List<string>();
+
         /// <summary>
         /// The new markdown
         /// </summary>
@@ -56,21 +53,5 @@ namespace AppEvents
             get;
             set;
         } = new List<string>();
-        /// <summary>
-        /// The old markdown reference link
-        /// </summary>
-        public string OldMarkdownReferenceLink
-        {
-            get;
-            set;
-        } = string.Empty;
-        /// <summary>
-        /// The new markdown reference link
-        /// </summary>
-        public string NewMarkdownReferenceLink 
-        { 
-            get; 
-            set; 
-        } = string.Empty;
     }
 }

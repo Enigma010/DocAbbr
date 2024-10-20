@@ -39,15 +39,6 @@ namespace App.Repositories.Dtos
         } = new List<string>();
 
         /// <summary>
-        /// The reference links
-        /// </summary>
-        public List<LinkDto> ReferenceLinks
-        {
-            get;
-            set;
-        } = new List<LinkDto>();
-
-        /// <summary>
         /// The markdown reference link
         /// </summary>
         public string MarkdownReferenceLink

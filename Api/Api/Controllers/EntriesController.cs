@@ -83,18 +83,6 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Changes links for an entry
-        /// </summary>
-        /// <param name="name">The name of the entry</param>
-        /// <param name="cmd">The change links command</param>
-        /// <returns>The action result</returns>
-        [HttpPut("{name}/links")]
-        public async Task<IActionResult> PutLinks([FromRoute] string name, [FromBody] ChangeEntryLinksCmd cmd)
-        {
-            return Ok(await _service.ChangeLinksAsync(name, cmd));
-        }
-
-        /// <summary>
         /// Gets the HTMl for the entry
         /// </summary>
         /// <param name="name">The name of the entry</param>

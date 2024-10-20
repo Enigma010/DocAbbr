@@ -15,12 +15,11 @@ namespace App.Commands
         /// Creates a markdown template change command
         /// </summary>
         /// <param name="markdownTemplate">The new markdown template</param>
-        public ChangeConfigMarkdownTemplateCmd(List<string> markdownTemplate, 
-            string markdownReferenceLink) 
+        public ChangeConfigMarkdownTemplateCmd(List<string> markdownTemplate) 
         { 
             Markdown = markdownTemplate;
-            MarkdownReferenceLink = markdownReferenceLink;
         }
+
         /// <summary>
         /// The markdown
         /// </summary>
@@ -29,13 +28,5 @@ namespace App.Commands
             get;
             set;
         } = new List<string>();
-        /// <summary>
-        /// The markdown reference link
-        /// </summary>
-        public string MarkdownReferenceLink
-        {
-            get;
-            set;
-        } = string.Empty;
     }
 }

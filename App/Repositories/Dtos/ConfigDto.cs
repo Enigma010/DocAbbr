@@ -29,9 +29,5 @@ namespace App.Repositories.Dtos
         /// The markdown for the entry
         /// </summary>
         public List<string> Markdown { get; set; } = new List<string>();
-        /// <summary>
-        /// 
-        /// </summary>
-        public string MarkdownReferenceLink { get; set; } = string.Empty;
     }
 }
